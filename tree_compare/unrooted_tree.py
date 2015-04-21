@@ -40,7 +40,9 @@ class UnrootedBinaryTree(object):
         if rooted_at is None:
             k, v = next(self.__leaves.iteritems())
             rooted_at = v
-        return self.branches_when_rooted_at(rooted_at).difference(other_tree.branches_when_rooted_at(rooted_at))
+        first_branch_set = self.branches_when_rooted_at(rooted_at)
+        second_branch_set = other_tree.branches_when_rooted_at(rooted_at)
+        return first_branch_set.symmetric_difference(second_branch_set)
 
     def compare_distances(self, other_tree):
         assert (set(self.leaf_labels()) == set(other_tree.leaf_labels()))
@@ -50,7 +52,6 @@ class UnrootedBinaryTree(object):
                 distance_difference += \
                     abs(self.leaf_distances()[label][other_label] - other_tree.leaf_distances()[label][other_label])
         return distance_difference * 1.0 / len(self.leaf_labels())
-
 
     def __label_nodes(self, current_node, labels, visited=None):
         if visited is None:
