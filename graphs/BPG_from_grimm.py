@@ -82,6 +82,9 @@ class BreakpointGraph:
                     elif chromosome[i] > 0 and chromosome[i+1] < 0:
                         genomes_dict[genome_number].append([gene[1],
                                                             next_gene[1]])
+                    elif chromosome[i] < 0 and chromosome[i+1] > 0: 
+                        genomes_dict[genome_number].append([gene[0],
+                                                            next_gene[0]])
                     else:
                         genomes_dict[genome_number].append([gene[0],
                                                             next_gene[1]])
