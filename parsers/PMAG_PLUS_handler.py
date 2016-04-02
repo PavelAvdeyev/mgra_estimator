@@ -34,5 +34,6 @@ class PMAG_PLUS_handler(Handler.Handler):
         Handler.write_genomes_with_grimm_in_file(pmag_plus_blocks_txt, genomes)
 
         tree_txt = os.path.join(pmag_plus_dir, "tree.txt")
-        shutil.copyfile(self.tree_file_with_tag, tree_txt)
-
+        tree_file_with_tags = os.path.join(dir_path, "tree.txt")
+        shutil.copyfile(tree_file_with_tags, tree_txt)
+        #shutil.copyfile(self.tree_file_with_tag, tree_txt)

@@ -29,13 +29,18 @@ class MGRA_handler(Handler.Handler):
 
         if not os.path.exists(mgra_dir):
             os.makedirs(mgra_dir)
+        blocks_txt = os.path.join(dir_path, 'blocks.txt')
 
-        genomes = Handler.parse_genomes_in_grimm_file(self.input_blocks_file)
+        genomes = Handler.parse_genomes_in_grimm_file(blocks_txt)
+        #genomes = Handler.parse_genomes_in_grimm_file(self.input_blocks_file)
         mgra_blocks_txt = os.path.join(mgra_dir, "blocks.txt")
         Handler.write_genomes_with_grimm_in_file(mgra_blocks_txt, genomes)
 
-        with open(self.tree_file_with_tag, 'r') as inp:
+        tree_file_with_tag_cool =  os.path.join(dir_path, "tree.txt")
+        with open(tree_file_with_tag_cool, 'r') as inp:
             tree_str = inp.readline().strip(" \t\n")
+        # with open(self.tree_file_with_tag, 'r') as inp:
+        #     tree_str = inp.readline().strip(" \t\n")
 
         config_txt = os.path.join(mgra_dir, "sim.cfg")
         with open(config_txt, 'w') as out:
