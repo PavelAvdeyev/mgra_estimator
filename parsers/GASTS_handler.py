@@ -1,8 +1,7 @@
 import os
-
 import Handler
 import shutil
-from ete2 import Tree
+from ete3 import Tree
 import utils.Genome as Genome
 
 
@@ -42,7 +41,7 @@ class GASTS_handler(Handler.Handler):
                 if line.find('>') != -1:
                     if chromosome.size() != 0:
                         genome.append(chromosome)
-                    if genome != None:
+                    if genome is not None:
                         genomes.append(genome)
                     chromosome = Genome.Chromosome()
                     genome = Genome.Genome()
@@ -70,7 +69,7 @@ class GASTS_handler(Handler.Handler):
 
         for branch, genome in zip(order_branch, genomes):
             genome_name = self.true_ancestor_names.get(branch)
-            if genome_name != None:
+            if genome_name is not None:
                 genome.set_name(genome_name)
                 result_genomes[genome_name] = genome
 
@@ -88,11 +87,15 @@ class GASTS_handler(Handler.Handler):
         blocks_txt = os.path.join(gasts_dir, self.input_blocks_file)
         gasts_tree_with_tag = os.path.join(gasts_dir, "tree_tag.txt")
         gasts_tree_txt = os.path.join(gasts_dir, "tree.txt")
+        tree_file_with_tag = os.path.join(dir_path, "tree.txt")
+        tree_file_without_tag = os.path.join(dir_path, "bad_tree.txt")
 
         genomes = Handler.parse_genomes_in_grimm_file(os.path.join(dir_path, self.input_blocks_file))
         Handler.write_genomes_with_grimm_in_file(blocks_txt, genomes)
-        shutil.copyfile(self.tree_file_with_tag, gasts_tree_with_tag)
-        shutil.copyfile(self.tree_file, gasts_tree_txt)
+        shutil.copyfile(tree_file_with_tag, gasts_tree_with_tag)
+        shutil.copyfile(tree_file_without_tag, gasts_tree_txt)
+        #shutil.copyfile(self.tree_file_with_tag, gasts_tree_with_tag)
+        #shutil.copyfile(self.tree_file, gasts_tree_txt)
 
     def _parse_tree_tag(self, dir_path):
         self.true_ancestor_names = {}
@@ -110,7 +113,9 @@ class GASTS_handler(Handler.Handler):
                         ancestor_split.sort()
 
                         result = [left_split, right_split, ancestor_split]
-                        result = ["".join(result[0]), "".join(result[1]), "".join(result[2])]
+                        result = ["".join(str(result[0])),
+                                  "".join(str(result[1])),
+                                  "".join(str(result[2]))]
                         result.sort()
 
                         branch = " ".join(result)
@@ -131,7 +136,7 @@ class GASTS_handler(Handler.Handler):
                 ancestor_split.sort()
 
                 result = [left_split, right_split, ancestor_split]
-                result = ["".join(result[0]), "".join(result[1]), "".join(result[2])]
+                result = ["".join(str(result[0])), "".join(str(result[1])), "".join(str(result[2]))]
                 result.sort()
 
                 branch = " ".join(result)
@@ -142,3 +147,4 @@ class GASTS_handler(Handler.Handler):
                 order_branch.append(node.name)
 
         return order_branch
+    
