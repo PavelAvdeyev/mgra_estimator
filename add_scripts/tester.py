@@ -18,7 +18,7 @@ if tool == 'PMAG':
     for test_dir in os.listdir(path):
         print(test_dir)
         old_path = str(path) + '/' + str(test_dir) + '/PMAG/'
-        new_path = '~/home/hamster/tools/PMAG/'
+        new_path = '~/tools/PMAG/'
 
         copyfile(old_path + 'blocks.txt', new_path)
         copyfile(old_path + 'tree.txt', new_path)
@@ -35,7 +35,7 @@ elif tool == 'MGRA':
     for test_dir in os.listdir(path):
         print(test_dir)
         current_path = str(path) + '/' + str(test_dir) + '/MGRA/'
-        operation = '~/home/hamster/tools/MGRA/build/mgra -c ' + \
+        operation = '~/tools/MGRA/build/mgra -c ' + \
                     current_path + 'sim.cfg -f grimm - g ' + current_path + \
                     'blocks.txt -o ' + current_path + ' 2>logerror.txt >/dev/null'
         print(subprocess.call(operation, shell=True))
@@ -44,7 +44,7 @@ elif tool == 'GASTS':
     for test_dir in os.listdir(path):
         print(test_dir)
         current_path = str(path) + '/' + str(test_dir) + '/GASTS/'
-        copyfile('~/home/hamster/tools/GASTS/gasts.jar', current_path)
+        copyfile('~/tools/GASTS/gasts.jar', current_path)
 
         operation = 'java -jar ' + current_path + \
                     'gasts.jar ' + current_path + \
@@ -63,7 +63,7 @@ elif tool == 'GapAdj':
             (dirName, fileName) = os.path.split(current_tree)
             (fileBaseName, fileExtension) = os.path.splitext(fileName)
             name_gen = fileBaseName + '.gap_gen'
-            operation = '~/home/hamster/tools/GapAdj/GapAdj ' \
+            operation = '~/tools/GapAdj/GapAdj ' \
                         + current_tree + ' ' + current_path + \
                         'blocks.txt ' + current_path + name_gen \
                         + ' 25 0.6 2>logerror.txt >/dev/null'
