@@ -1,5 +1,5 @@
 import os
-import utils.Genome as Genome
+from Genome import Genome, Chromosome
 
 
 class Handler(object):
@@ -21,10 +21,10 @@ def parse_genome_in_grimm_file(full_name):
     > [number] - name on genome
     return genome have genome type (see Genome class)
     """
-    genome = Genome.Genome()
+    genome = Genome()
 
     with open(full_name, 'r') as f:
-        chromosome = Genome.Chromosome()
+        chromosome = Chromosome()
         for line in f:
             line = line.strip(' \n\t')
 
@@ -40,11 +40,11 @@ def parse_genome_in_grimm_file(full_name):
                 if str_gene == '$':
                     chromosome.set_circular(False)
                     genome.append(chromosome)
-                    chromosome = Genome.Chromosome()
+                    chromosome = Chromosome()
                 elif str_gene == '@':
                     chromosome.set_circular(True)
                     genome.append(chromosome)
-                    chromosome = Genome.Chromosome()
+                    chromosome = Chromosome()
                 elif len(str_gene) != 0:
                     chromosome.append(int(str_gene))
     return genome
@@ -60,8 +60,8 @@ def parse_genomes_in_grimm_file(full_name):
     genomes = []
 
     with open(full_name, 'r') as f:
-        genome = Genome.Genome()
-        chromosome = Genome.Chromosome()
+        genome = Genome()
+        chromosome = Chromosome()
 
         for line in f:
             line = line.strip(' \n\t')
@@ -75,8 +75,8 @@ def parse_genomes_in_grimm_file(full_name):
 
                 genomes.append(genome)
 
-                chromosome = Genome.Chromosome()
-                genome = Genome.Genome()
+                chromosome = Chromosome()
+                genome = Genome()
                 genome.set_name(line[1:])
                 continue
 
@@ -85,11 +85,11 @@ def parse_genomes_in_grimm_file(full_name):
                 if str_gene == '$':
                     chromosome.set_circular(False)
                     genome.append(chromosome)
-                    chromosome = Genome.Chromosome()
+                    chromosome = Chromosome()
                 elif str_gene == '@':
                     chromosome.set_circular(True)
                     genome.append(chromosome)
-                    chromosome = Genome.Chromosome()
+                    chromosome = Chromosome()
                 elif len(str_gene) != 0:
                     chromosome.append(int(str_gene))
 
@@ -155,3 +155,44 @@ def write_genome_with_grimm_in_file(path_to_file, genome):
                 out.write(" @\n")
             else:
                 out.write(" $\n")
+
+
+def write_genomes_with_cars_in_file(path_to_file, genomes):
+    """
+    Write all genomes in file.
+    Save in InferCARs format.
+    No circular chromosomes for now
+    """
+    with open(path_to_file, 'w') as out:
+        blocks = {}
+        for genome in genomes:
+            chrom_index = 1
+            for chromosome in genome:
+                i = 1
+                for block in chromosome:
+                    if abs(block) not in blocks:
+                        print(block)
+                        if int(block) < 0:
+                            blocks[abs(block)] = [[genome.get_name(), chrom_index,
+                                                   str(i) + ':' + str(i+98), '-']]
+                        else:
+                            blocks[block] = [[genome.get_name(), chrom_index,
+                                              str(i) + ':' + str(i+98), '+']]
+                    else:
+                        if int(block) < 0:
+                            blocks[abs(block)].append([genome.get_name(), chrom_index,
+                                                       str(i) + ':' + str(i+98),'-'])
+                        else:
+                            blocks[block].append([genome.get_name(), chrom_index,
+                                                  str(i) + ':' + str(i+98), '+'])
+                    i += 100
+                chrom_index += 1
+        number = 1
+        print(blocks)
+        for block in blocks:
+            out.write(">%s\n" % str(number))
+            for element in blocks[block]:
+                out.write('%s.%s:%s %s\n' % (str(element[0]), str(element[1]),
+                                             str(element[2]), str(element[3])))
+            number += 1
+            out.write('\n')
