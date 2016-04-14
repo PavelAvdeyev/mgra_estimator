@@ -6,7 +6,7 @@ import sys
 import logging
 import utils.utils as utils
 
-from parsers import Handler, PMAG_PLUS_handler, GapAdj_handler, MGRA_handler, Procars_handler
+from parsers import Handler, PMAG_PLUS_handler, GapAdj_handler, MGRA_handler, Procars_handler, infercarspro_handler
 from parsers.GASTS_handler import GASTS_handler
 
 
@@ -38,6 +38,8 @@ def dojob(name_directory, tools):
                     PMAG_PLUS_handler.PMAG_PLUS_handler().save(subpath)
                 elif tool == 'Procars':
                     Procars_handler.Procars_handler().save(subpath)
+                elif tool == 'InferCarsPro':
+                    infercarspro_handler.Infercarspro_handler().save(subpath)
                 #prepare_input_files(subpath, tools)
                 #prepare_ancestor(subpath)
 
@@ -54,7 +56,7 @@ if __name__ == "__main__":
 
     dir_path = os.path.abspath(sys.argv[1])
 
-    tools = ['GASTS', 'PMAG+', 'MGRA', 'GapAdj', 'Procars']
+    tools = ['GASTS', 'PMAG+', 'MGRA', 'GapAdj', 'Procars', 'InferCarsPro']
 
     dojob(dir_path, tools)
     #prepare_input_files(dir_path, tools)

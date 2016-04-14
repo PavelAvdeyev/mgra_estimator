@@ -8,7 +8,8 @@ import sys
 from shutil import copyfile, move
 
 parser = argparse.ArgumentParser(description='Script for running tools ')
-parser.add_argument('tool', choices=['GapAdj', 'PMAG', 'MGRA', 'GASTS'], type=str,
+parser.add_argument('tool', choices=['GapAdj', 'PMAG', 'MGRA',
+                                     'GASTS', 'Procars', 'InferCarsPro'], type=str,
                     help='Run tool of your choice')
 parser.add_argument('path', type=str, help='Path to folder with chosen parameters')
 
@@ -29,16 +30,27 @@ def main_runner(tool, path):
             run_GASTS(path, test_dir)
         elif tool == 'Procars':
             run_procars(path, test_dir)
+        elif tool == 'InferCarsPro':
+            run_infercarspro(path, test_dir)
 
 
 def run_procars(path, test_dir):
     old_path = os.path.join(path, test_dir, 'Procars', '')
-    new_path = '~/tools/procars/'
+    new_path = '~/tools/Procars/'
     os.chdir(new_path)
     operation = 'PYTHONPATH+=. python2 bin/procars_main ' \
                 '-t '+ old_path + 'tree.txt ' \
                 '-b ' + old_path + 'blocks.txt ' \
                 '-r ' + old_path + 'result'
+    print(subprocess.call(operation, shell=True))
+
+
+def run_infercarspro(path, test_dir):
+    old_path = os.path.join(path, test_dir, 'InferCarsPro', '')
+    new_path = '~/tools/InferCarsPro/'
+    os.chdir(new_path)
+    operation = './InferCarsPro ' + old_path + 'tree.txt ' \
+                '' + old_path + 'blocks.txt'
     print(subprocess.call(operation, shell=True))
 
 
