@@ -26,6 +26,7 @@ def prepare_input_files(dir_path, tools):
 
 def dojob(name_directory, tools):
     for tool in tools:
+        print('Preparing input files for %s' % tool)
         for path, name in utils.get_immediate_subdirectories(name_directory):
             for subpath, subname in utils.get_immediate_subdirectories(path):
                 if tool == 'GASTS':
