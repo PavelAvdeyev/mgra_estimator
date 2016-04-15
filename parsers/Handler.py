@@ -171,7 +171,6 @@ def write_genomes_with_cars_in_file(path_to_file, genomes):
                 i = 1
                 for block in chromosome:
                     if abs(block) not in blocks:
-                        print(block)
                         if int(block) < 0:
                             blocks[abs(block)] = [[genome.get_name(), chrom_index,
                                                    str(i) + ':' + str(i + 98), '-']]
@@ -188,7 +187,6 @@ def write_genomes_with_cars_in_file(path_to_file, genomes):
                     i += 100
                 chrom_index += 1
         number = 1
-        print(blocks)
         for block in blocks:
             out.write(">%s\n" % str(number))
             for element in blocks[block]:
