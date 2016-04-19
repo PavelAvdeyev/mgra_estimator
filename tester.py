@@ -5,7 +5,7 @@ import subprocess
 import os
 import logging
 import sys
-from shutil import copyfile, move
+from shutil import copyfile, move, copy
 
 parser = argparse.ArgumentParser(description='Script for running tools ')
 parser.add_argument('tool', choices=['GapAdj', 'PMAG', 'MGRA',
@@ -36,9 +36,9 @@ def main_runner(tool, path):
 
 def run_procars(path, test_dir):
     old_path = os.path.join(path, test_dir, 'Procars', '')
-    new_path = '~/tools/Procars/'
+    new_path = '/home/hamster/tools/procars/'
     os.chdir(new_path)
-    operation = 'PYTHONPATH+=. python2 bin/procars_main ' \
+    operation = 'python2 procars_main ' \
                 '-t '+ old_path + 'tree.txt ' \
                 '-b ' + old_path + 'blocks.txt ' \
                 '-r ' + old_path + 'result'
@@ -47,18 +47,25 @@ def run_procars(path, test_dir):
 
 def run_infercarspro(path, test_dir):
     old_path = os.path.join(path, test_dir, 'InferCarsPro', '')
-    new_path = '~/tools/InferCarsPro/'
+    new_path = '/home/hamster/tools/InferCarsPro/'
     os.chdir(new_path)
-    operation = './InferCarsPro ' + old_path + 'tree.txt ' \
+    operation = './InferCarsPro ' + old_path + 'tree_tag.txt ' \
                 '' + old_path + 'blocks.txt'
     print(subprocess.call(operation, shell=True))
+    files = os.listdir(new_path)
+    infer_files = filter(lambda x: x.endswith('.txt') and x.startswith('Infer'), files)
+    infer_car_files = filter(lambda x: x.endswith('.car'), files)
+    for file in infer_files:
+        move(file, old_path)
+    for file in infer_car_files:
+        move(file, old_path)
 
 
 def run_PMAG(path, test_dir):
     old_path = os.path.join(path, test_dir, 'PMAG', '')
-    new_path = '~/tools/PMAG/'
-    copyfile(old_path + 'blocks.txt', new_path)
-    copyfile(old_path + 'tree.txt', new_path)
+    new_path = '/home/hamster/tools/PMAG/'
+    copy(old_path + 'blocks.txt', new_path)
+    copy(old_path + 'tree.txt', new_path)
     os.chdir(new_path)
     operation = 'perl RunPMAG+.pl blocks.txt tree.txt result.txt'
     print(subprocess.call(operation, shell=True))
@@ -77,11 +84,12 @@ def run_MGRA(path, test_dir):
 
 def run_GASTS(path, test_dir):
     current_path = os.path.join(path, test_dir, 'GASTS', '')
-    copyfile('~/tools/GASTS/gasts.jar', current_path)
-    operation = 'java -jar ' + current_path + \
-                'gasts.jar ' + current_path + \
-                'tree.txt ' + current_path + \
-                'blocks.txt 2>logerror.txt'
+    copy('/home/hamster/tools/GASTS/gasts.jar', current_path + 'gasts.jar')
+    operation = 'java -jar ' + \
+                'gasts.jar ' + \
+                'tree.txt ' + \
+                'blocks.txt'
+    os.chdir(current_path)
     print(subprocess.call(operation, shell=True))
     os.remove(current_path + 'gasts.jar')
 
@@ -95,15 +103,15 @@ def run_GapAdj(path, test_dir):
         (fileBaseName, fileExtension) = os.path.splitext(fileName)
         name_gen = fileBaseName + '.gap_gen'
         operation = '~/tools/GapAdj/GapAdj ' \
-                    + current_tree + ' ' + current_path + \
-                    'blocks.txt ' + current_path + name_gen \
-                    + ' 25 0.6 2>logerror.txt >/dev/null'
+                    + current_tree + ' ' + dirName + \
+                    '/blocks.txt ' + dirName + '/' + name_gen \
+                    + ' 25 0.6'
         print(subprocess.call(operation, shell=True))
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    if (len(args) < 2):
+    if (len(sys.argv) < 2):
         sys.stderr.write("USAGE: tester.py <tool> <path> \n")
         sys.exit(1)
 
