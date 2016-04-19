@@ -173,17 +173,17 @@ def write_genomes_with_cars_in_file(path_to_file, genomes):
                     if abs(block) not in blocks:
                         if int(block) < 0:
                             blocks[abs(block)] = [[genome.get_name(), chrom_index,
-                                                   str(i) + ':' + str(i + 98), '-']]
+                                                   str(i) + '-' + str(i + 98), '-']]
                         else:
                             blocks[block] = [[genome.get_name(), chrom_index,
-                                              str(i) + ':' + str(i + 98), '+']]
+                                              str(i) + '-' + str(i + 98), '+']]
                     else:
                         if int(block) < 0:
                             blocks[abs(block)].append([genome.get_name(), chrom_index,
-                                                       str(i) + ':' + str(i + 98), '-'])
+                                                       str(i) + '-' + str(i + 98), '-'])
                         else:
                             blocks[block].append([genome.get_name(), chrom_index,
-                                                  str(i) + ':' + str(i + 98), '+'])
+                                                  str(i) + '-' + str(i + 98), '+'])
                     i += 100
                 chrom_index += 1
         number = 1
