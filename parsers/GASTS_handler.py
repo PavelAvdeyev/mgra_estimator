@@ -1,8 +1,10 @@
 import os
-import Handler
+from parsers import Handler
 import shutil
 from ete3 import Tree
 import utils.Genome as Genome
+import graphs.BPG_from_grimm as BPGscript
+import measures.Measures as Measures
 
 
 class GASTS_handler(Handler.Handler):
@@ -147,4 +149,31 @@ class GASTS_handler(Handler.Handler):
                 order_branch.append(node.name)
 
         return order_branch
-    
+
+
+    def compare_dist_GASTS(self, dir_path):
+        distances = {}
+        genomes = self.parse(dir_path)
+        anc_genomes = Handler.parse_genomes_in_grimm_file(dir_path + '/ancestral.txt')
+        for i in genomes:
+            for j in anc_genomes:
+                if i == j:
+                    genomes_list = [genomes[i], anc_genomes[j]]
+                distances[i] = BPGscript.BreakpointGraph().DCJ_distance(BPGscript.BreakpointGraph().BPG_from_genomes(genomes_list))
+        return min(distances)
+
+    def compare_acc_GASTS(self, dir_path):
+        accuracies = {}
+        genomes = self.parse(dir_path)
+        anc_genomes = Handler.parse_genomes_in_grimm_file(dir_path + '/ancestral.txt')
+        for i in genomes:
+            for j in anc_genomes:
+                if i == j:
+                    accuracies[i] = Measures.calculate_accuracy_measure(genomes[i], anc_genomes[j])
+        return accuracies
+
+
+
+
+
+
