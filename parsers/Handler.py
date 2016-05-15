@@ -101,6 +101,57 @@ def parse_genomes_in_grimm_file(full_name):
     return genomes[1:]
 
 
+def parse_genome_in_procars_file(full_name):
+    genome = Genome()
+    with open(full_name, 'r') as f:
+        chromosome = Chromosome()
+        for line in f:
+            line = line.strip(' \n\t')
+            genome.set_name('Ancestor')
+
+            if line.find("#") != -1 or len(line) == 0:
+                continue
+
+            line = line.strip('_Q ')
+            line = line.strip(' Q_')
+            chromosome = Chromosome()
+            for gene in line.split(' '):
+                str_gene = gene.strip(' \n\t')
+                if len(str_gene) != 0:
+                    chromosome.append(int(str_gene))
+            chromosome.set_circular(False)
+            genome.append(chromosome)
+    return genome
+
+
+def parse_genome_in_infercarspro_file(full_name):
+    genome = Genome()
+    with open(full_name, 'r') as f:
+        chromosome = Chromosome()
+        for line in f:
+            line = line.strip(' \n\t')
+            anc_name = full_name[-5]
+            genome.set_name(anc_name)
+
+            if line.find("#") != -1 or line.find('>') != -1 or len(line) == 0:
+                continue
+
+            chromosome = Chromosome()
+            for gene in line.split(' '):
+                str_gene = gene.strip(' \n\t')
+                if str_gene == '$':
+                    chromosome.set_circular(False)
+                    genome.append(chromosome)
+                    chromosome = Chromosome()
+                elif str_gene == '@':
+                    chromosome.set_circular(True)
+                    genome.append(chromosome)
+                    chromosome = Chromosome()
+                elif len(str_gene) != 0:
+                    chromosome.append(int(str_gene))
+
+    return genome
+
 def write_genomes_with_grimm_by_name(dir_path, genomes, type):
     """
     Write genomes in files. Each file have name according genome name.

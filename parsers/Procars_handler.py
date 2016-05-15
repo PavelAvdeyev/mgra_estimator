@@ -2,8 +2,10 @@ import os
 
 import utils.utils as utils
 import utils.Genome as Genome
-import Handler
+from parsers import Handler
 import shutil
+import graphs.BPG_from_grimm as BPGscript
+import measures.Measures as Measures
 
 
 class Procars_handler(Handler.Handler):
@@ -36,6 +38,30 @@ class Procars_handler(Handler.Handler):
             f.write(tree_str)
 
         shutil.copyfile(tree_file_with_tag, procars_tree_with_tag)
+
+    def parse(self, path):
+        path_dir = os.path.join(path, 'Procars', "result", 'ProCars_PQtree.txt')
+        genome = Handler.parse_genome_in_procars_file(path_dir)
+        return genome
+
+    def compare_dist_procars(self, dir_path):
+        distances = {}
+        genome = self.parse(dir_path)
+        anc_genomes = Handler.parse_genomes_in_grimm_file(dir_path + '/ancestral.txt')
+        for j in anc_genomes:
+            genomes_list = [genome, j]
+            distances[j.get_name()] = BPGscript.BreakpointGraph(). \
+                DCJ_distance(BPGscript.BreakpointGraph().BPG_from_genomes(genomes_list))
+        return distances[max(distances)]
+
+    def compare_acc_procars(self, dir_path):
+        accuracies = {}
+        genome = self.parse(dir_path)
+        anc_genomes = Handler.parse_genomes_in_grimm_file(dir_path + '/ancestral.txt')
+        for j in anc_genomes:
+            print(j.get_name())
+            accuracies[j.get_name()] = Measures.calculate_accuracy_measure(genome, j)
+        return accuracies[min(accuracies)]
 
 
 
