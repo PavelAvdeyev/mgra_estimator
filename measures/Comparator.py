@@ -1,4 +1,4 @@
-from parsers import PMAG_PLUS_handler, Handler, GASTS_handler, GapAdj_handler, MGRA_handler, Procars_handler, infercarspro_handler
+from parsers import PMAG_PLUS_handler, Handler, GASTS_handler, GapAdj_handler, MGRA_handler, Procars_handler, infercarspro_handler, Rococo_handler
 import os
 import csv
 
@@ -16,10 +16,14 @@ def single_tool_data(tool, path):
             dist.append(GASTS_handler.GASTS_handler().compare_dist_GASTS(path + '/' + test_dir))
             accuracy.append(GASTS_handler.GASTS_handler().compare_acc_GASTS(path + '/' + test_dir))
             test.append(test_dir)
-        # elif tool == 'GapAdj':
-        #     run_GapAdj(path, test_dir)
-        # elif tool == 'MGRA':
-        #     run_MGRA(path, test_dir)
+        elif tool == 'GapAdj':
+            dist.append(GapAdj_handler.GapAdj_handler().compare_dist_GapAdj(path + '/' + test_dir))
+            accuracy.append(GapAdj_handler.GapAdj_handler().compare_acc_GapAdj(path + '/' + test_dir))
+            test.append(test_dir)
+        elif tool == 'MGRA':
+            dist.append(MGRA_handler.MGRA_handler().compare_dist_MGRA(path + '/' + test_dir))
+            accuracy.append(MGRA_handler.MGRA_handler().compare_acc_MGRA(path + '/' + test_dir))
+            test.append(test_dir)
         elif tool == 'Procars':
             dist.append(Procars_handler.Procars_handler().compare_dist_procars(path + '/' + test_dir))
             accuracy.append(Procars_handler.Procars_handler().compare_acc_procars(path + '/' + test_dir))
@@ -28,6 +32,11 @@ def single_tool_data(tool, path):
             dist.append(infercarspro_handler.Infercarspro_handler().compare_dist_Infercarspro(path + '/' + test_dir))
             accuracy.append(infercarspro_handler.Infercarspro_handler().compare_acc_Infercarspro(path + '/' + test_dir))
             test.append(test_dir)
+        elif tool == 'Rococo':
+            dist.append(Rococo_handler.Rococo_handler().compare_dist_rococo(path + '/' + test_dir))
+            accuracy.append(Rococo_handler.Rococo_handler().compare_acc_rococo(path + '/' + test_dir))
+            test.append(test_dir)
+
 
     mean_dist = sum(dist)/10
     TP, FN, FP = [], [], []
@@ -53,11 +62,11 @@ def tool_compare_dist(tool, path):
             print('not done')
     return(list(zip(param_dirs, dist)))
 
-distances = tool_compare_dist('GASTS', '/home/hamster/noindel-sim')
-#distances = single_tool_data('Procars', '/home/hamster/noindel-sim/6_200_100_0')
-with open('distances_gasts.csv','w') as out:
-    csv_out = csv.writer(out)
-    csv_out.writerow(['name','DCJ distance'])
-    for row in distances:
-        csv_out.writerow(row)
+# distances = tool_compare_dist('GASTS', '/home/hamster/noindel-sim')
+# #distances = single_tool_data('Procars', '/home/hamster/noindel-sim/6_200_100_0')
+# with open('distances_gasts.csv','w') as out:
+#     csv_out = csv.writer(out)
+#     csv_out.writerow(['name','DCJ distance'])
+#     for row in distances:
+#         csv_out.writerow(row)
 
