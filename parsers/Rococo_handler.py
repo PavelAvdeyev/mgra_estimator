@@ -31,6 +31,11 @@ class Rococo_handler(Handler.Handler):
         tree_file_with_tag = os.path.join(dir_path, "tree.txt")
         shutil.copyfile(tree_file_with_tag, infer_tree_with_tag)
 
+    def parse(self, path):
+        path_dir = os.path.join(path, 'Rococo', "result")
+        genomes = Handler.parse_genomes_in_rococo_file(path_dir)
+        return genomes
+
     def _write_genomes(self, path_to_file, genomes):
         with open(path_to_file, 'w') as out:
             for genome in genomes:
@@ -46,3 +51,27 @@ class Rococo_handler(Handler.Handler):
                     else:
                         out.write('|\n')
                 out.write("\n")
+
+    def compare_dist_rococo(self, dir_path):
+        distances = {}
+        genomes = self.parse(dir_path)
+        anc_genomes = Handler.parse_genomes_in_grimm_file(dir_path + '/ancestral.txt')
+        for i in genomes:
+            for j in anc_genomes:
+                if i == j.get_name():
+                    genomes_list = [genomes[i], j]
+            distances[i] = BPGscript.BreakpointGraph(). \
+                DCJ_distance(BPGscript.BreakpointGraph().BPG_from_genomes(genomes_list))
+        return distances[max(distances)]
+
+    def compare_acc_rococo(self, dir_path):
+        accuracies = {}
+        genomes = self.parse(dir_path)
+        anc_genomes = Handler.parse_genomes_in_grimm_file(dir_path + '/ancestral.txt')
+        for i in genomes:
+            for j in anc_genomes:
+                print(j.get_name())
+                if i == j.get_name():
+                    accuracies[i] = Measures.calculate_accuracy_measure(genomes[i], j)
+        return accuracies[min(accuracies)]
+

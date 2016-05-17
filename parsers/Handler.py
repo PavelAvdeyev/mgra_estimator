@@ -152,6 +152,33 @@ def parse_genome_in_infercarspro_file(full_name):
 
     return genome
 
+def parse_genomes_in_rococo_file(full_name):
+    genomes = []
+    with open(full_name, 'r') as f:
+        for line in f:
+            if line.find('CARs') == -1:
+                continue
+            else:
+                line = line.split('\t')
+                genome = Genome()
+                genome.set_name(line[0].strip(':'))
+                chromosomes = line[2].split('[')
+                for chrom in chromosomes[1:]:
+                    chrom = chrom.split(']')
+                    for chr in chrom:
+                        if chr != '};\n' and chr != ',':
+                            chr = chr.split(', ')
+                            chromosome = Chromosome()
+                            for gene in chr:
+                                if len(gene) != 0:
+                                    chromosome.append(int(gene))
+                            chromosome.set_circular(False)
+                            genome.append(chromosome)
+            genomes.append(genome)
+
+    return genomes
+
+
 def write_genomes_with_grimm_by_name(dir_path, genomes, type):
     """
     Write genomes in files. Each file have name according genome name.
@@ -181,6 +208,29 @@ def write_genomes_with_grimm_in_file(path_to_file, genomes):
         for genome in genomes:
             out.write(">%s\n" % genome.get_name())
             for chromosome in genome:
+                for gene in chromosome:
+                    out.write(str(gene) + " ")
+
+                if chromosome.is_circular():
+                    out.write(" @\n")
+                else:
+                    out.write(" $\n")
+
+def write_genomes_with_grimm_plus_chr_in_file(path_to_file, genomes):
+    """
+    Write all genomes in file.
+    Save in grimm format.
+    """
+    with open(path_to_file, 'w') as out:
+        for genome in genomes:
+            n = 1
+            blocks_number = 0
+            for chromosome in genome:
+                blocks_number += chromosome.size()
+            out.write(">%s\t#%s\t#%s\n" % (genome.get_name(), blocks_number, genome.get_length()))
+            for chromosome in genome:
+                out.write("#%s\n" % n)
+                n += 1
                 for gene in chromosome:
                     out.write(str(gene) + " ")
 
@@ -245,3 +295,5 @@ def write_genomes_with_cars_in_file(path_to_file, genomes):
                                              str(element[2]), str(element[3])))
             number += 1
             out.write('\n')
+
+
