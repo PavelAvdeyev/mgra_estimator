@@ -1,5 +1,5 @@
 import os
-from Genome import Genome, Chromosome
+from utils.Genome import Genome, Chromosome
 
 
 class Handler(object):
@@ -179,6 +179,65 @@ def parse_genomes_in_rococo_file(full_name):
     return genomes
 
 
+def parse_genomes_in_cars_file(full_name):
+    genomes = {}
+    with open(full_name, 'r') as f:
+
+        for line in f:
+            if line.find('>') != -1:
+                marker = int(line[1:])
+            elif line != '\n':
+                line = line.split('.')
+                if line[0] not in genomes:
+                    chrom_number = line[1].split(':')[0]
+                    orientation = line[1].split(':')[1].split(' ')[1].strip('\n')
+                    position = line[1].split(':')[1].split(' ')[0].split('-')[1]
+                    chromosome = []
+                    if orientation == '-':
+                        chromosome.append([(marker-2*marker), int(position)])
+                    elif orientation == '+':
+                        chromosome.append([marker, int(position)])
+                    genomes[line[0]] = {chrom_number : chromosome}
+                else:
+                    chrom_number = line[1].split(':')[0]
+                    orientation = line[1].split(':')[1].split(' ')[1].strip('\n')
+                    position = line[1].split(':')[1].split(' ')[0].split('-')[1]
+                    if orientation == '-':
+                        if chrom_number in genomes[line[0]]:
+                            genomes[line[0]][chrom_number].append([(marker-2*marker), int(position)])
+                        else:
+                            chromosome = []
+                            chromosome.append([(marker - 2 * marker), int(position)])
+                            genomes[line[0]][chrom_number] = chromosome
+                    elif orientation == '+':
+                        if chrom_number in genomes[line[0]]:
+                            genomes[line[0]][chrom_number].append([marker, int(position)])
+                        else:
+                            chromosome = []
+                            chromosome.append([marker, int(position)])
+                            genomes[line[0]][chrom_number] = chromosome
+
+    result_genomes = []
+    for i in genomes:
+        genome = Genome()
+        genome.set_name(i)
+        for j in genomes[i]:
+            chromosome = Chromosome()
+            chrom_list = []
+            for block in genomes[i][j]:
+                chrom_list.append(block)
+            chrom_list = sorted(chrom_list, key=lambda x: x[1])
+            for block in chrom_list:
+                chromosome.append(block[0])
+            genome.append(chromosome)
+        result_genomes.append(genome)
+
+    return result_genomes
+
+def sort_by_marker_position(input_list):
+    return input_list[1]
+
+
 def write_genomes_with_grimm_by_name(dir_path, genomes, type):
     """
     Write genomes in files. Each file have name according genome name.
@@ -296,4 +355,5 @@ def write_genomes_with_cars_in_file(path_to_file, genomes):
             number += 1
             out.write('\n')
 
-
+car = parse_genomes_in_cars_file('/home/hamster/RealData/mammalian_genomes/Gavranovic/blocks.txt')
+write_genomes_with_grimm_in_file('kusnyam.txt', car)
