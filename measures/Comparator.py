@@ -66,8 +66,32 @@ def tool_compare_dist(tool, path):
             dist.append(single_tool_data(tool, path + '/' + param_dir)[0])
             param_dirs.append(param_dir)
         except:
-            print('not done')
-    return(list(zip(param_dirs, dist)))
+            dist.append('not done')
+            param_dirs.append(param_dir)
+    #return(list(zip(param_dirs, dist)))
+    return dist, param_dirs
+
+def tools_compare_dist(tools, path):
+    param_dirs = []
+    tool_dist = {}
+    for tool in tools:
+        tool_dist[tool] = tool_compare_dist(tool, path)[0]
+        param_dirs = tool_compare_dist(tool, path)[1]
+    return param_dirs, tool_dist
+
+tools = ['GASTS', 'Procars']
+distances = tools_compare_dist(tools, '/home/hamster/noindel-sim')
+#distances = single_tool_data('Procars', '/home/hamster/noindel-sim/6_200_100_0')
+with open('distances_gp.csv','w') as out:
+     csv_out = csv.writer(out)
+     csv_out.writerow(distances[0])
+     for tool in distances[1]:
+         row = [tool]
+         for i in distances[1][tool]:
+             row.append(i)
+         csv_out.writerow(row)
+
+
 
 # distances = tool_compare_dist('GASTS', '/home/hamster/noindel-sim')
 # #distances = single_tool_data('Procars', '/home/hamster/noindel-sim/6_200_100_0')
