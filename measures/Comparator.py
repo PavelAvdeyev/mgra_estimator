@@ -8,8 +8,7 @@ import logging
 import sys
 from shutil import copyfile, move, copy
 import fnmatch
-import tester
-import time
+
 
 def single_tool_data(tool, path):
     dist = []
@@ -73,36 +72,12 @@ def tool_compare_dist(tool, path):
 # distances = tool_compare_dist('GASTS', '/home/hamster/noindel-sim')
 # #distances = single_tool_data('Procars', '/home/hamster/noindel-sim/6_200_100_0')
 # with open('distances_gasts.csv','w') as out:
-#     csv_out = csv.writer(out)
-#     csv_out.writerow(['name','DCJ distance'])
-#     for row in distances:
-#         csv_out.writerow(row)
+#      csv_out = csv.writer(out)
+#      csv_out.writerow(['name','DCJ distance'])
+#      for row in distances:
+#          csv_out.writerow(row)
 
-def single_check(tool, path, test_dir):
-    print(tool + 'works with ' + test_dir)
-    if tool == 'GapAdj':
-        tester.run_GapAdj(path, test_dir)
-    if tool == 'PMAG':
-        tester.run_PMAG(path, test_dir)
-    elif tool == 'MGRA':
-        tester.run_MGRA(path, test_dir)
-    elif tool == 'GASTS':
-        tester.run_GASTS(path, test_dir)
-    elif tool == 'Procars':
-        tester.run_procars(path, test_dir)
-    elif tool == 'InferCarsPro':
-        tester.run_infercarspro(path, test_dir)
-    elif tool == 'Rococo':
-        tester.run_rococo(path, test_dir)
 
-def time_check(path):
-    tools = ['GapAdj', 'PMAG', 'MGRA', 'GASTS', 'Procars', 'InferCarsPro', 'Rococo']
-    with open('tool_time.csv', 'w') as out:
-        csv_out = csv.writer(out)
-        csv_out.writerow(['name', 'time'])
-        for tool in tools:
-            start = time.time()
-            tester.main_runner(tool, path)
-            csv_out.writerow([tool, time.time() - start])
 
-time_check('/home/hamster/noindel-sim/6_200_100_0/1')
+
+
