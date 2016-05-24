@@ -7,6 +7,8 @@ import logging
 import sys
 from shutil import copyfile, move, copy
 import fnmatch
+import csv
+import time
 
 parser = argparse.ArgumentParser(description='Script for running tools ')
 parser.add_argument('tool', choices=['GapAdj', 'PMAG', 'MGRA',
@@ -46,17 +48,17 @@ def main_runner_all(tool, path):
         for test_dir in os.listdir(path + '/' + dir):
             print('working with ' + test_dir)
             if tool == 'GapAdj':
-                run_GapAdj(path, test_dir)
+                run_GapAdj(path + '/' + dir, test_dir)
             elif tool == 'PMAG':
                 run_PMAG(path + '/' + dir, test_dir)
             elif tool == 'MGRA':
-                run_MGRA(path, test_dir)
+                run_MGRA(path + '/' + dir, test_dir)
             elif tool == 'GASTS':
                 run_GASTS(path + '/' + dir, test_dir)
             elif tool == 'Procars':
-                run_procars(path, test_dir)
+                run_procars(path + '/' + dir, test_dir)
             elif tool == 'InferCarsPro':
-                run_infercarspro(path, test_dir)
+                run_infercarspro(path + '/' + dir, test_dir)
             elif tool == 'Rococo':
                 run_rococo(path + '/' + dir, test_dir)
 
@@ -71,6 +73,7 @@ def run_procars(path, test_dir):
                     '-b ' + old_path + 'blocks.txt ' \
                     '-r ' + old_path + 'result'
         print(subprocess.call(operation, shell=True))
+
 
 
 def run_infercarspro(path, test_dir):
@@ -93,7 +96,7 @@ def run_infercarspro(path, test_dir):
 def run_PMAG(path, test_dir):
     old_path = os.path.join(path, test_dir, 'PMAG', '')
     new_path = '/home/hamster/tools/PMAG/'
-    if len(fnmatch.filter(os.listdir(old_path), '*.*')) > 2:
+    if len(fnmatch.filter(os.listdir(old_path), '*.*')) == 2:
         copy(old_path + 'blocks.txt', new_path)
         copy(old_path + 'tree.txt', new_path)
         os.chdir(new_path)
@@ -115,7 +118,7 @@ def run_MGRA(path, test_dir):
 
 def run_GASTS(path, test_dir):
     current_path = os.path.join(path, test_dir, 'GASTS', '')
-    if len(fnmatch.filter(os.listdir(old_path), '*.*')) > 2:
+    if len(fnmatch.filter(os.listdir(current_path), '*.*')) > 2:
         copy('/home/hamster/tools/GASTS/gasts.jar', current_path + 'gasts.jar')
         operation = 'java -jar ' + \
                     'gasts.jar ' + \
@@ -153,6 +156,15 @@ def run_rococo(path, test_dir):
     print(subprocess.call(operation, shell=True))
     os.remove(current_path + 'rococo.jar')
 
+def time_check(tool, path):
+    #tools = ['GapAdj', 'PMAG', 'MGRA', 'GASTS', 'Procars', 'InferCarsPro', 'Rococo']
+    with open('tool_time.csv', 'w') as out:
+        csv_out = csv.writer(out)
+        csv_out.writerow(['name', 'time'])
+        start = time.time()
+        main_runner(tool, path)
+        csv_out.writerow([tool, time.time() - start])
+
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
@@ -164,7 +176,13 @@ if __name__ == "__main__":
         sys.stderr.write("<path> - is directory with strong hierarchy\n")
         sys.exit(1)
 
-    main_runner_all(tool, path)
+    time_check(tool, path)
+
+    #main_runner_all(tool, path)
+
+
+
+
 
 
 
