@@ -109,15 +109,18 @@ def parse_genome_in_procars_file(full_name):
             line = line.strip(' \n\t')
             genome.set_name('Ancestor')
 
-            if line.find("#") != -1 or len(line) == 0:
+            if line.find("#") != -1 or len(line) == 0 or line.startswith('>'):
                 continue
 
             line = line.strip('_Q ')
             line = line.strip(' Q_')
+            line = line.strip('_R ')
+            line = line.strip(' R_')
+            line = line.strip('T ')
             chromosome = Chromosome()
             for gene in line.split(' '):
                 str_gene = gene.strip(' \n\t')
-                if len(str_gene) != 0:
+                if len(str_gene) != 0 and str_gene != 'Q_':
                     chromosome.append(int(str_gene))
             chromosome.set_circular(False)
             genome.append(chromosome)
@@ -355,5 +358,3 @@ def write_genomes_with_cars_in_file(path_to_file, genomes):
             number += 1
             out.write('\n')
 
-car = parse_genomes_in_cars_file('/home/hamster/RealData/mammalian_genomes/Gavranovic/blocks.txt')
-write_genomes_with_grimm_in_file('kusnyam.txt', car)
