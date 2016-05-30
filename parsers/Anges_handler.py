@@ -11,6 +11,11 @@ class Anges_handler(Handler.Handler):
         super(Anges_handler, self).__init__("Anges")
         #self.name_tool = "Anges"
 
+    def parse_cars(self, dir_path):
+        path_dir = os.path.join(dir_path, 'Anges', "TEL_BAB", 'CARS', 'NON_DUP_YEAST_PQRTREE_DOUBLED')
+        genome = Handler.parse_genome_in_procars_file(path_dir)
+        return genome
+
     '''
     Blocks file in Cars format, needs weightened trees, all combined in PARAMETERS file.
     '''
