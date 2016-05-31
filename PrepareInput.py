@@ -65,6 +65,4 @@ if __name__ == "__main__":
 
     tools = ['GASTS', 'PMAG+', 'MGRA', 'GapAdj', 'Procars', 'InferCarsPro', 'Anges', 'Rococo']
 
-    dojob(dir_path, ['Rococo'])
-    #prepare_input_files(dir_path, tools)
-    #prepare_ancestor(dir_path)
+    dojob(dir_path, tools)
