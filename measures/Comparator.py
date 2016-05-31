@@ -1,13 +1,6 @@
-from parsers import PMAG_PLUS_handler, Handler, GASTS_handler, GapAdj_handler, MGRA_handler, Procars_handler, infercarspro_handler, Rococo_handler
-import os
+from parsers import PMAG_PLUS_handler, GASTS_handler, GapAdj_handler, MGRA_handler, Procars_handler, infercarspro_handler, Rococo_handler
 import csv
-import argparse
-import subprocess
 import os
-import logging
-import sys
-from shutil import copyfile, move, copy
-import fnmatch
 
 
 def single_tool_data(tool, path):
@@ -43,8 +36,6 @@ def single_tool_data(tool, path):
             dist.append(Rococo_handler.Rococo_handler().compare_dist_rococo(path + '/' + test_dir))
             accuracy.append(Rococo_handler.Rococo_handler().compare_acc_rococo(path + '/' + test_dir))
             test.append(test_dir)
-
-
     mean_dist = sum(dist)/10
     TP, FN, FP = [], [], []
     print(accuracy)
@@ -58,6 +49,7 @@ def single_tool_data(tool, path):
     mean_acc = [mean_TP, mean_FN, mean_FP]
     return mean_dist, mean_acc
 
+
 def tool_compare_dist(tool, path):
     param_dirs = []
     dist = []
@@ -68,38 +60,89 @@ def tool_compare_dist(tool, path):
         except:
             dist.append('not done')
             param_dirs.append(param_dir)
-    #return(list(zip(param_dirs, dist)))
     return dist, param_dirs
 
-def tools_compare_dist(tools, path):
+
+def tool_compare_acc(tool, path):
     param_dirs = []
+    acc = {}
+    acc['TP'] = []
+    acc['FN'] = []
+    acc['FP'] = []
+    for param_dir in os.listdir(path):
+        try:
+            acc['TP'].append(single_tool_data(tool, path + '/' + param_dir)[1][0])
+            acc['FN'].append(single_tool_data(tool, path + '/' + param_dir)[1][1])
+            acc['FP'].append(single_tool_data(tool, path + '/' + param_dir)[1][2])
+            param_dirs.append(param_dir)
+        except:
+            acc['TP'].append('not done')
+            acc['FN'].append('not done')
+            acc['FP'].append('not done')
+            param_dirs.append(param_dir)
+    return acc, param_dirs
+
+
+def tools_compare_acc(tools, path):
+    param_dirs = []
+    tool_acc = {}
+    tool_acc['TP'] = {}
+    tool_acc['FN'] = {}
+    tool_acc['FP'] = {}
+    for tool in tools:
+        tool_acc['TP'][tool] = tool_compare_acc(tool, path)[0]['TP']
+        tool_acc['FN'][tool] = tool_compare_acc(tool, path)[0]['FN']
+        tool_acc['FP'][tool] = tool_compare_acc(tool, path)[0]['FP']
+        param_dirs = tool_compare_dist(tool, path)[1]
+    return param_dirs, tool_acc
+
+
+def tools_compare_dist(tools, path):
     tool_dist = {}
     for tool in tools:
-        tool_dist[tool] = tool_compare_dist(tool, path)[0]
-        param_dirs = tool_compare_dist(tool, path)[1]
-    return param_dirs, tool_dist
-
-tools = ['GASTS', 'Procars']
-distances = tools_compare_dist(tools, '/home/hamster/noindel-sim')
-#distances = single_tool_data('Procars', '/home/hamster/noindel-sim/6_200_100_0')
-with open('distances_gp.csv','w') as out:
-     csv_out = csv.writer(out)
-     csv_out.writerow(distances[0])
-     for tool in distances[1]:
-         row = [tool]
-         for i in distances[1][tool]:
-             row.append(i)
-         csv_out.writerow(row)
+        tool_dist[tool] = tool_compare_dist(tool, path)
+    return tool_dist
 
 
+def create_acc_table(tools, path, result_path):
+    accuracies = tools_compare_acc(tools, path)
+    with open(result_path, 'w') as out:
+        csv_out = csv.writer(out)
+        header = [' ']
+        for i in accuracies[0]:
+            header.append(i)
+        csv_out.writerow(header)
+        for tool in accuracies[1]['TP']:
+            csv_out.writerow(tool)
+            row = ['TP']
+            for i in accuracies[1]['TP'][tool]:
+                row.append(i)
+            csv_out.writerow(row)
+            row = ['FN']
+            for i in accuracies[1]['FN'][tool]:
+                row.append(i)
+            csv_out.writerow(row)
+            row = ['FP']
+            for i in accuracies[1]['FP'][tool]:
+                row.append(i)
+            csv_out.writerow(row)
 
-# distances = tool_compare_dist('GASTS', '/home/hamster/noindel-sim')
-# #distances = single_tool_data('Procars', '/home/hamster/noindel-sim/6_200_100_0')
-# with open('distances_gasts.csv','w') as out:
-#      csv_out = csv.writer(out)
-#      csv_out.writerow(['name','DCJ distance'])
-#      for row in distances:
-#          csv_out.writerow(row)
+
+def create_dist_table(tools, path, result_path):
+    distances = tools_compare_dist(tools, path)
+    with open(result_path, 'w') as out:
+        csv_out = csv.writer(out)
+        header = [' ']
+        for i in distances:
+            for j in distances[i][1]:
+                header.append(j)
+        csv_out.writerow(header)
+        for tool in distances:
+            row = [tool]
+            for i in distances[tool][0]:
+                row.append(i)
+            csv_out.writerow(row)
+
 
 
 
